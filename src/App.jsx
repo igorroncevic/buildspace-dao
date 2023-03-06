@@ -1,5 +1,6 @@
 import {
   useAddress,
+  useNetwork,
   ConnectWallet,
   useContract,
   Web3Button,
@@ -7,11 +8,14 @@ import {
 } from "@thirdweb-dev/react";
 import { useState, useEffect, useMemo } from "react";
 import { AddressZero } from "@ethersproject/constants";
+import { ChainId } from "@thirdweb-dev/sdk";
 
 const App = () => {
   // Use the hooks thirdweb give us.
   const address = useAddress();
   console.log("👋 Address:", address);
+
+  const network = useNetwork();
 
   // Initialize our Edition Drop contract
   const editionDropAddress = "0x2C969Dca386d36527E2d8F9A5B8a034E3F62Bc1c";
@@ -153,6 +157,18 @@ const App = () => {
       };
     });
   }, [memberAddresses, memberTokenAmounts]);
+
+  if (address && network?.[0].data.chain.id !== ChainId.Goerli) {
+    return (
+      <div className="unsupported-network">
+        <h2>Please connect to Goerli</h2>
+        <p>
+          This dapp only works on the Goerli network, please switch networks in
+          your connected wallet.
+        </p>
+      </div>
+    );
+  }
 
   // This is the case where the user hasn't connected their wallet
   // to your web app. Let them call connectWallet.
